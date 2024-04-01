@@ -9,7 +9,7 @@
 
         <Version>0.10.3</Version>
 
-        <Copyright>Copyright 2022-$([System.DateTime]::Now.ToString(`yyyy`)) &#169; The Tabalonia Project</Copyright>
+        <Copyright>Copyright 2022-$([System.DateTime]::Now.ToString(`yyyy`)) © The Tabalonia Project</Copyright>
         <PackageProjectUrl>https://github.com/egorozh/Tabalonia</PackageProjectUrl>
         <RepositoryUrl>https://github.com/egorozh/Tabalonia</RepositoryUrl>
         <PackageTags>Tab Control, Draggable, Avalonia, AvaloniaUI</PackageTags>
@@ -20,15 +20,15 @@
     
    
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.0" />
+        <PackageReference Include="Avalonia" Version="11.1.0-beta1" />
     </ItemGroup>
     
     <ItemGroup Label="PackageIcon">
-        <None Include="..\Icon.png" Pack="true" Visible="false" PackagePath=""/>
+        <None Include="..\Icon.png" Pack="true" Visible="false" PackagePath="" />
     </ItemGroup>
     
     <ItemGroup>
-        <None Include="..\README.md" Pack="true" Visible="false" PackagePath="\"/>
+        <None Include="..\README.md" Pack="true" Visible="false" PackagePath="\" />
     </ItemGroup>
     
 </Project>

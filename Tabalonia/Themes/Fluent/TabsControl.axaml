@@ -118,19 +118,12 @@
                                          HorizontalAlignment="Stretch"
                                          DockPanel.Dock="{TemplateBinding TabStripPlacement}">
 
-                            <Thumb Name="PART_LeftDragWindowThumb"
-                                   MinWidth="{TemplateBinding LeftThumbWidth}" />
-
-
                             <ItemsPresenter Name="PART_ItemsPresenter"
                                             ItemsPanel="{TemplateBinding ItemsPanel}" />
 
                             <Button Command="{Binding AddItemCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                     Theme="{StaticResource AddItemCommandButton}" 
                                     IsVisible="{TemplateBinding ShowDefaultAddButton}"/>
-
-                            <Thumb Name="PART_RightDragWindowThumb"
-                                   MinWidth="{TemplateBinding RightThumbWidth}" />
 
                         </panels:TopPanel>
 

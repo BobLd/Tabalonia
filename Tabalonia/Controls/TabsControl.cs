@@ -3,7 +3,6 @@ using System.Windows.Input;
 using Tabalonia.Events;
 using Tabalonia.Panels;
 
-
 namespace Tabalonia.Controls;
 
 public class TabsControl : TabControl
@@ -12,14 +11,7 @@ public class TabsControl : TabControl
 
     private const double DefaultTabWidth = 140;
 
-    public const double WindowsAndLinuxDefaultLeftThumbWidth = 4d;
-    public const double MacOsDefaultLeftThumbWidth = 80d;
-
-    public const double WindowsDefaultRightThumbWidth = 160d;
-    public const double MacOsDefaultRightThumbWidth = 50d;
-
     #endregion
-
 
     #region Private Fields
 
@@ -30,55 +22,33 @@ public class TabsControl : TabControl
 
     private ICommand _addItemCommand;
     private ICommand _closeItemCommand;
-
     #endregion
-
 
     #region Avalonia Properties
 
     public static readonly StyledProperty<double> AdjacentHeaderItemOffsetProperty =
         AvaloniaProperty.Register<TabsControl, double>(nameof(AdjacentHeaderItemOffset), defaultValue: 0);
 
-
     public static readonly StyledProperty<double> TabItemWidthProperty =
         AvaloniaProperty.Register<TabsControl, double>(nameof(TabItemWidth), defaultValue: DefaultTabWidth);
-
 
     public static readonly StyledProperty<bool> ShowDefaultCloseButtonProperty =
         AvaloniaProperty.Register<TabsControl, bool>(nameof(ShowDefaultCloseButton), defaultValue: true);
 
-
     public static readonly StyledProperty<bool> ShowDefaultAddButtonProperty =
         AvaloniaProperty.Register<TabsControl, bool>(nameof(ShowDefaultAddButton), defaultValue: true);
-
 
     public static readonly StyledProperty<int> FixedHeaderCountProperty =
         AvaloniaProperty.Register<TabsControl, int>(nameof(FixedHeaderCount), defaultValue: 0);
 
-
     public static readonly StyledProperty<Func<Task<object>>?> NewItemAsyncFactoryProperty =
         AvaloniaProperty.Register<TabsControl, Func<Task<object>>?>(nameof(NewItemAsyncFactory));
-
 
     public static readonly StyledProperty<Func<object>?> NewItemFactoryProperty =
         AvaloniaProperty.Register<TabsControl, Func<object>?>(nameof(NewItemFactory));
 
-
     public static readonly StyledProperty<EventHandler<CloseLastTabEventArgs>?> LastTabClosedActionProperty =
         AvaloniaProperty.Register<TabsControl, EventHandler<CloseLastTabEventArgs>?>(nameof(LastTabClosedAction));
-
-
-    public static readonly StyledProperty<double> LeftThumbWidthProperty =
-        AvaloniaProperty.Register<TabsControl, double>(nameof(LeftThumbWidth),
-            defaultValue: OperatingSystem.IsMacOS()
-                ? MacOsDefaultLeftThumbWidth
-                : WindowsAndLinuxDefaultLeftThumbWidth);
-
-
-    public static readonly StyledProperty<double> RightThumbWidthProperty =
-        AvaloniaProperty.Register<TabsControl, double>(nameof(RightThumbWidth),
-            defaultValue: OperatingSystem.IsWindows() ? WindowsDefaultRightThumbWidth : MacOsDefaultRightThumbWidth);
-
 
     public static readonly DirectProperty<TabsControl, ICommand> AddItemCommandProperty =
         AvaloniaProperty.RegisterDirect<TabsControl, ICommand>(
@@ -86,51 +56,39 @@ public class TabsControl : TabControl
             o => o.AddItemCommand,
             (o, v) => o.AddItemCommand = v);
 
-
     public static readonly DirectProperty<TabsControl, ICommand> CloseItemCommandProperty =
         AvaloniaProperty.RegisterDirect<TabsControl, ICommand>(
             nameof(CloseItemCommand),
             o => o.CloseItemCommand,
             (o, v) => o.CloseItemCommand = v);
-
     #endregion
 
-
     #region Constructor
-
     public TabsControl()
     {
         AddHandler(DragTabItem.DragStarted, ItemDragStarted, handledEventsToo: true);
         AddHandler(DragTabItem.DragDelta, ItemDragDelta);
         AddHandler(DragTabItem.DragCompleted, ItemDragCompleted, handledEventsToo: true);
 
-        _tabsPanel = new TabsPanel(this)
-        {
-            ItemWidth = TabItemWidth,
-            ItemOffset = AdjacentHeaderItemOffset
-        };
+        _tabsPanel = new TabsPanel(this) { ItemWidth = TabItemWidth, ItemOffset = AdjacentHeaderItemOffset };
 
         _tabsPanel.DragCompleted += TabsPanelOnDragCompleted;
 
-        ItemsPanel = new FuncTemplate<Panel>(() => _tabsPanel);
+        ItemsPanel = new FuncTemplate<Panel?>(() => _tabsPanel);
 
         LastTabClosedAction = (_, _) => GetThisWindow()?.Close();
 
         _addItemCommand = new SimpleActionCommand(AddItem);
         _closeItemCommand = new SimpleParamActionCommand(CloseItem);
     }
-
     #endregion
 
-
     #region Public Properties
-
     public double AdjacentHeaderItemOffset
     {
         get => GetValue(AdjacentHeaderItemOffsetProperty);
         set => SetValue(AdjacentHeaderItemOffsetProperty, value);
     }
-
 
     public double TabItemWidth
     {
@@ -138,13 +96,11 @@ public class TabsControl : TabControl
         set => SetValue(TabItemWidthProperty, value);
     }
 
-
     public bool ShowDefaultCloseButton
     {
         get => GetValue(ShowDefaultCloseButtonProperty);
         set => SetValue(ShowDefaultCloseButtonProperty, value);
     }
-
 
     public bool ShowDefaultAddButton
     {
@@ -152,13 +108,11 @@ public class TabsControl : TabControl
         set => SetValue(ShowDefaultAddButtonProperty, value);
     }
 
-
     public Func<Task<object>>? NewItemAsyncFactory
     {
         get => GetValue(NewItemAsyncFactoryProperty);
         set => SetValue(NewItemAsyncFactoryProperty, value);
     }
-
 
     public Func<object>? NewItemFactory
     {
@@ -166,16 +120,14 @@ public class TabsControl : TabControl
         set => SetValue(NewItemFactoryProperty, value);
     }
 
-
     public EventHandler<CloseLastTabEventArgs>? LastTabClosedAction
     {
         get => GetValue(LastTabClosedActionProperty);
         set => SetValue(LastTabClosedActionProperty, value);
     }
 
-
     /// <summary>
-    /// Allows a the first adjacent tabs to be fixed (no dragging, and default close button will not show).
+    /// Allows the first adjacent tabs to be fixed (no dragging, and default close button will not show).
     /// </summary>
     public int FixedHeaderCount
     {
@@ -183,56 +135,22 @@ public class TabsControl : TabControl
         set => SetValue(FixedHeaderCountProperty, value);
     }
 
-
-    public double LeftThumbWidth
-    {
-        get => GetValue(LeftThumbWidthProperty);
-        set => SetValue(LeftThumbWidthProperty, value);
-    }
-
-
-    public double RightThumbWidth
-    {
-        get => GetValue(RightThumbWidthProperty);
-        set => SetValue(RightThumbWidthProperty, value);
-    }
-
-
     public ICommand AddItemCommand
     {
         get => _addItemCommand;
         private set => SetAndRaise(AddItemCommandProperty, ref _addItemCommand, value);
     }
 
-
     public ICommand CloseItemCommand
     {
         get => _closeItemCommand;
         private set => SetAndRaise(CloseItemCommandProperty, ref _closeItemCommand, value);
     }
-
     #endregion
 
-
     #region Protected Methods
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-
-        var leftDragWindowThumb = e.NameScope.Get<Thumb>("PART_LeftDragWindowThumb");
-        leftDragWindowThumb.DragDelta += WindowDragThumbOnDragDelta;
-        leftDragWindowThumb.DoubleTapped += WindowDragThumbOnDoubleTapped;
-
-        var rightDragWindowThumb = e.NameScope.Get<Thumb>("PART_RightDragWindowThumb");
-        rightDragWindowThumb.DragDelta += WindowDragThumbOnDragDelta;
-        rightDragWindowThumb.DoubleTapped += WindowDragThumbOnDoubleTapped;
-    }
-
-
     protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey) =>
         new DragTabItem();
-
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
@@ -247,12 +165,9 @@ public class TabsControl : TabControl
             _tabsPanel.ItemWidth = TabItemWidth;
         }
     }
-
     #endregion
 
-
     #region Private Methods
-
     private void RemoveItem(DragTabItem container)
     {
         object? item = ItemFromContainer(container);
@@ -274,13 +189,10 @@ public class TabsControl : TabControl
             SetSelectedNewTab(itemsList, removedItemIndex);
     }
 
-
     private void SetSelectedNewTab(IList items, int removedItemIndex) =>
         SelectedItem = removedItemIndex == items.Count ? items[^1] : items[removedItemIndex];
 
-
     private Window? GetThisWindow() => this.FindLogicalAncestorOfType<Window>();
-
 
     private IEnumerable<DragTabItem> DragTabItems()
     {
@@ -292,7 +204,6 @@ public class TabsControl : TabControl
                 yield return dragTabItem;
         }
     }
-
 
     private void ItemDragStarted(object? sender, DragTabDragStartedEventArgs e)
     {
@@ -312,7 +223,6 @@ public class TabsControl : TabControl
             SelectedItem = item;
         }
     }
-
 
     private void ItemDragDelta(object? sender, DragTabDragDeltaEventArgs e)
     {
@@ -339,7 +249,6 @@ public class TabsControl : TabControl
         e.Handled = true;
     }
 
-
     private void ItemDragCompleted(object? sender, DragTabDragCompletedEventArgs e)
     {
         foreach (var item in DragTabItems())
@@ -353,7 +262,6 @@ public class TabsControl : TabControl
         _dragging = false;
     }
 
-
     private void SetDraggingItem(DragTabItem draggedItem)
     {
         foreach (var item in DragTabItems())
@@ -366,7 +274,6 @@ public class TabsControl : TabControl
         draggedItem.IsSiblingDragging = false;
     }
 
-
     private void TabsPanelOnDragCompleted()
     {
         MoveTabModelsIfNeeded();
@@ -374,9 +281,13 @@ public class TabsControl : TabControl
         _draggedItem = null;
     }
 
-
     private void MoveTabModelsIfNeeded()
     {
+        if (_draggedItem is null)
+        {
+            return;
+        }
+
         object? item = ItemFromContainer(_draggedItem);
 
         if (item != null)
@@ -401,36 +312,20 @@ public class TabsControl : TabControl
         }
     }
 
-
-    private void WindowDragThumbOnDoubleTapped(object? sender, RoutedEventArgs e)
-    {
-        var window = this.FindLogicalAncestorOfType<Window>();
-
-        window?.RestoreWindow();
-    }
-
-
-    private void WindowDragThumbOnDragDelta(object? sender, VectorEventArgs e)
-    {
-        var window = this.FindLogicalAncestorOfType<Window>();
-
-        window?.DragWindow(e.Vector.X, e.Vector.Y);
-    }
-
-
     private void AddItem()
     {
         if (NewItemAsyncFactory is not null)
         {
-            NewItemAsyncFactory.Invoke().ContinueWith(t => { AddItem(t.Result); },
-                scheduler: TaskScheduler.FromCurrentSynchronizationContext());
+            NewItemAsyncFactory.Invoke().ContinueWith(t =>
+            {
+                AddItem(t.Result);
+            }, scheduler: TaskScheduler.FromCurrentSynchronizationContext());
 
             return;
         }
 
         AddItem(NewItemFactory?.Invoke());
     }
-
 
     private void AddItem(object? newItem)
     {
@@ -442,7 +337,6 @@ public class TabsControl : TabControl
         SelectedItem = newItem;
     }
 
-
     private void CloseItem(object? tabItemSource)
     {
         ArgumentNullException.ThrowIfNull(tabItemSource);
@@ -452,6 +346,5 @@ public class TabsControl : TabControl
 
         RemoveItem(tabItem);
     }
-
     #endregion
 }

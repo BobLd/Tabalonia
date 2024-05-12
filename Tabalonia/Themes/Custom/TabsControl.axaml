@@ -57,21 +57,13 @@
                                          Name="PART_TopPanel"
                                          Background="{TemplateBinding Background}"
                                          HorizontalAlignment="Stretch">
-                            
-                            <Thumb Name="PART_LeftDragWindowThumb"
-                                   MinWidth="{TemplateBinding LeftThumbWidth}"
-                                   Theme="{StaticResource WindowThumbStyle}"/>
-                            
+
                             <ItemsPresenter Name="PART_ItemsPresenter"
                                             ItemsPanel="{TemplateBinding ItemsPanel}" />
 
                             <Button Classes="AddItemCommandButtonStyle" 
                                     Command="{Binding AddItemCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                     IsVisible="{TemplateBinding ShowDefaultAddButton}"/>
-
-                            <Thumb Name="PART_RightDragWindowThumb"
-                                   MinWidth="{TemplateBinding RightThumbWidth}"
-                                   Theme="{StaticResource WindowThumbStyle}"/>
 
                         </panels:TopPanel>
 

@@ -1,10 +1,8 @@
 using Avalonia.Automation.Peers;
 
-
 namespace Tabalonia.Controls;
 
-
-public class LeftPressedThumb : TemplatedControl
+public sealed class LeftPressedThumb : TemplatedControl
 {
     public static readonly RoutedEvent<VectorEventArgs> DragStartedEvent =
         RoutedEvent.Register<Thumb, VectorEventArgs>(nameof(DragStarted), RoutingStrategies.Bubble);
@@ -15,9 +13,7 @@ public class LeftPressedThumb : TemplatedControl
     public static readonly RoutedEvent<VectorEventArgs> DragCompletedEvent =
         RoutedEvent.Register<Thumb, VectorEventArgs>(nameof(DragCompleted), RoutingStrategies.Bubble);
 
-    
     private Point? _lastPoint;
-    
 
     public event EventHandler<VectorEventArgs>? DragStarted
     {
@@ -37,25 +33,19 @@ public class LeftPressedThumb : TemplatedControl
         remove => RemoveHandler(DragCompletedEvent, value);
     }
 
-
     protected override AutomationPeer OnCreateAutomationPeer() => new LeftPressedThumbPeer(this);
 
-    
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         if (_lastPoint.HasValue)
         {
-            var ev = new VectorEventArgs
-            {
-                RoutedEvent = DragCompletedEvent,
-                Vector = _lastPoint.Value,
-            };
+            var ev = new VectorEventArgs { RoutedEvent = DragCompletedEvent, Vector = _lastPoint.Value, };
 
             _lastPoint = null;
 
             RaiseEvent(ev);
         }
-        
+
         base.OnPointerCaptureLost(e);
     }
 
@@ -63,13 +53,12 @@ public class LeftPressedThumb : TemplatedControl
     {
         if (!IsLeftButtonPressed(e))
             return;
-        
+
         if (_lastPoint.HasValue)
         {
             var ev = new VectorEventArgs
             {
-                RoutedEvent = DragDeltaEvent,
-                Vector = e.GetPosition(this) - _lastPoint.Value,
+                RoutedEvent = DragDeltaEvent, Vector = e.GetPosition(this) - _lastPoint.Value,
             };
 
             RaiseEvent(ev);
@@ -80,51 +69,40 @@ public class LeftPressedThumb : TemplatedControl
     {
         if (!IsLeftButtonPressed(e))
             return;
-        
+
         e.Handled = true;
         _lastPoint = e.GetPosition(this);
 
-        var ev = new VectorEventArgs
-        {
-            RoutedEvent = DragStartedEvent,
-            Vector = (Vector)_lastPoint,
-        };
-        
+        var ev = new VectorEventArgs { RoutedEvent = DragStartedEvent, Vector = (Vector)_lastPoint, };
+
         e.PreventGestureRecognition();
 
         RaiseEvent(ev);
     }
-    
-    
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         if (!IsLeftButtonPressed(e))
             return;
-        
+
         if (_lastPoint.HasValue)
         {
             e.Handled = true;
             _lastPoint = null;
 
-            var ev = new VectorEventArgs
-            {
-                RoutedEvent = DragCompletedEvent,
-                Vector = e.GetPosition(this),
-            };
+            var ev = new VectorEventArgs { RoutedEvent = DragCompletedEvent, Vector = e.GetPosition(this), };
 
             RaiseEvent(ev);
         }
     }
 
-    
     private bool IsLeftButtonPressed(PointerEventArgs args)
     {
         var point = args.GetCurrentPoint(this);
-        
+
         return point.Properties.IsLeftButtonPressed;
     }
-    
-    
+
     private class LeftPressedThumbPeer : ControlAutomationPeer
     {
         public LeftPressedThumbPeer(LeftPressedThumb owner) : base(owner) { }

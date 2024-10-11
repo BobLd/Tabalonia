@@ -20,6 +20,14 @@ public class TabsControl : TabControl
 
     #endregion
 
+    #region Events
+
+    public event EventHandler<DragTabDragStartedEventArgs>? OnTabDragStarted;
+
+    public event EventHandler<DragTabDragCompletedEventArgs>? OnTabDragCompleted;
+
+    #endregion
+
 
     #region Private Fields
 
@@ -296,6 +304,8 @@ public class TabsControl : TabControl
 
     private void ItemDragStarted(object? sender, DragTabDragStartedEventArgs e)
     {
+        OnTabDragStarted?.Invoke(sender, e);
+
         _draggedItem = e.TabItem;
 
         e.Handled = true;
@@ -351,6 +361,8 @@ public class TabsControl : TabControl
         Dispatcher.UIThread.Post(() => _tabsPanel.InvalidateMeasure(), DispatcherPriority.Loaded);
 
         _dragging = false;
+
+        OnTabDragCompleted?.Invoke(sender, e);
     }
 
 

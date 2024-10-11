@@ -24,6 +24,15 @@ public class TabsControl : TabControl
     private ICommand _closeItemCommand;
     #endregion
 
+    #region Events
+
+    public event EventHandler<DragTabDragStartedEventArgs>? OnTabDragStarted;
+
+    public event EventHandler<DragTabDragCompletedEventArgs>? OnTabDragCompleted;
+
+    #endregion
+
+
     #region Avalonia Properties
 
     public static readonly StyledProperty<double> AdjacentHeaderItemOffsetProperty =
@@ -207,6 +216,8 @@ public class TabsControl : TabControl
 
     private void ItemDragStarted(object? sender, DragTabDragStartedEventArgs e)
     {
+        OnTabDragStarted?.Invoke(sender, e);
+
         _draggedItem = e.TabItem;
 
         e.Handled = true;
@@ -260,6 +271,7 @@ public class TabsControl : TabControl
         Dispatcher.UIThread.Post(() => _tabsPanel.InvalidateMeasure(), DispatcherPriority.Loaded);
 
         _dragging = false;
+        OnTabDragCompleted?.Invoke(sender, e);
     }
 
     private void SetDraggingItem(DragTabItem draggedItem)

@@ -30,6 +30,8 @@ public class TabsControl : TabControl
 
     public event EventHandler<DragTabDragCompletedEventArgs>? OnTabDragCompleted;
 
+    public event EventHandler<MoveTabMoveStartedEventArgs>? OnMoveTabStarted;
+    public event EventHandler<MoveTabMoveCompletedEventArgs>? OnMoveTabCompleted;
     #endregion
 
 
@@ -222,8 +224,6 @@ public class TabsControl : TabControl
 
         e.Handled = true;
 
-        _draggedItem.IsSelected = true;
-
         object? item = ItemFromContainer(_draggedItem);
 
         if (item != null)
@@ -233,6 +233,8 @@ public class TabsControl : TabControl
 
             SelectedItem = item;
         }
+
+        _draggedItem.IsSelected = true;
     }
 
     private void ItemDragDelta(object? sender, DragTabDragDeltaEventArgs e)
@@ -310,15 +312,18 @@ public class TabsControl : TabControl
             {
                 if (container.LogicalIndex != list.IndexOf(item))
                 {
+                    OnMoveTabStarted?.Invoke(this, new MoveTabMoveStartedEventArgs());
                     list.Remove(item);
                     list.Insert(container.LogicalIndex, item);
-
-                    SelectedItem = item;
-
                     int i = 0;
 
                     foreach (var dragTabItem in DragTabItems())
+                    {
                         dragTabItem.LogicalIndex = i++;
+                    }
+
+                    SelectedItem = item;
+                    OnMoveTabCompleted?.Invoke(this, new MoveTabMoveCompletedEventArgs());
                 }
             }
         }

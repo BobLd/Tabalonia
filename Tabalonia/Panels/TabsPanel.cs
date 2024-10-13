@@ -218,7 +218,9 @@ public class TabsPanel : Panel
         }
 
         dragItem.ZIndex = ZIndexes.Selected;
-        
+
+        //         var ev = new VectorEventArgs { RoutedEvent = DragCompletedEvent, Vector = _lastPoint.Value, };
+
         DragCompleted?.Invoke();
             
         return finalSize;
